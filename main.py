@@ -101,6 +101,14 @@ def view(t):
     collection = db[t]
     flask.session['free']=[]
     key_info = collection.find( { "type": "key" } )
+    responders = collection.find({"type":"responder"})
+    r = "Responders: "
+    for person in responders:
+        r += person['name']
+        r += ", "
+    r=r.strip()
+    r=r.strip(",")
+    flask.session['responders'] = r
     flask.session['desc'] = key_info[0]['description']
     length = key_info[0]['length']
     blocks = []
@@ -403,12 +411,21 @@ def choose(t):
     ## 'return' 
     app.logger.debug("Checking credentials for Google calendar access")
     credentials = valid_credentials()
+    flask.session['ret']=t
     if not credentials:
-      flask.session['ret']=t
       app.logger.debug("Redirecting to authorization")
       return flask.redirect(flask.url_for('oauth2callback'))
 
     gcal_service = get_gcal_service(credentials)
+    collection = db[t]
+    responders = collection.find({"type":"responder"})
+    r = "Responders: "
+    for person in responders:
+        r += person['name']
+        r += ", "
+    r=r.strip()
+    r=r.strip(",")
+    flask.session['responders'] = r
     app.logger.debug("Returned from get_gcal_service")
     flask.session['calendars'] = list_calendars(gcal_service)
     return render_template('view.html')
@@ -505,8 +522,11 @@ def check_apt():
         return flask.redirect(flask.url_for('oauth2callback'))
     gcal_service = get_gcal_service(credentials)
     title = request.args.get("name", type=str)
-    print(title)
+    responder = request.args.get("resp", type=str)
+    print(responder)
     collection = db[title]
+    rec = {"type":"responder", "name":responder}
+    collection.insert(rec)
     idlist = request.args.get("calen", type=str)
     ids = idlist.split()
     for record in collection.find( { "type": "day" } ).sort('begin',pymongo.ASCENDING):
