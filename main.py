@@ -6,7 +6,6 @@ from flask import jsonify
 import uuid
 
 import json
-from bson import ObjectId
 import logging
 
 import ast
