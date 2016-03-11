@@ -45,6 +45,9 @@
   {% if session.desc is defined %}
     <p style="color:darkred" id="desc" name="desc" value={{session.desc}}>{{session.desc}}</p>
   {% endif %}
+  {% if session.responders is defined %}
+   <p>{{session.responders}}</p>
+  {% endif %}
   <ul>
   {% for item in session.free %}
     <li>{{item}}</li> 
@@ -53,7 +56,7 @@
   <input type="submit" value="Choose" />
   </form>
 
-<form action="/setcheck" method="post">
+<form>
 {% if session.calendars is defined  %}
   <div class="col-md-4">
   {% for cal in session.calendars if cal.selected %}
@@ -65,8 +68,14 @@
          {% endif %}
   {% endfor %}
   </div>
+  Responder's Name:<input type="text" name="namae" id= "namae" size="12"
+       value=""
+       style="background: #fff; cursor: pointer; padding: 5px 10px;
+       border: 1px solid #ccc; width: 12em" >
+  <br>
+  <button type="button" id="check" name="check" onclick="fn()">Check</button>
 {% endif %}
-<button type="button" id="check" name="check" onclick="fn()">Check</button>
+
 </form>
 </div>
 
@@ -78,6 +87,7 @@
 <script>
 function fn(){
    var boxes = document.getElementsByName('box');
+   var responder = document.getElementById('namae').value;
    var cal_ids = '';
    var title =document.getElementById('title').value;
    for(var i = 0; i < boxes.length; i++){
@@ -88,7 +98,7 @@ function fn(){
          cal_ids = cal_ids.concat(boxes[i].value);
       }
    }
-   $.getJSON( "/_check_apt", { name: title, calen: cal_ids}, 
+   $.getJSON( "/_check_apt", { name: title, calen: cal_ids, resp:responder }, 
               function(data) {
                 var res = data.result;
                 location.reload();
