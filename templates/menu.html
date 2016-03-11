@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html lang="en"> <head>
+<title>MeetMe:Menu</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="stylesheet" type="text/css"
+     href="//cdn.jsdelivr.net/bootstrap/latest/css/bootstrap.css"
+/>
+
+<link rel="stylesheet" type="text/css"
+ href="/static/js/node_modules/bootstrap-daterangepicker/daterangepicker.css"
+/>
+
+<link rel="stylesheet" type="text/css"
+    href="/static/css/busy.css"
+/>
+
+<!-- jquery from a content distribution network; probably cached -->
+<script type="text/javascript"
+     src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js">
+</script>
+
+
+<!-- The rest of our javascript dependencies are bundled and -->
+<!-- 'minified' by 'browserify'  -->
+<script type="text/javascript" 
+   src="/static/js/busy.min.js">
+</script>
+
+</head>
+
+<body>
+<div align="center">
+<h1 style="color:darkred"><ins>MeetMe</ins></h1>
+<p style="color:darkred"> <i>A Google Calendars meeting scheduler</i></p>
+<br>
+{% if session.collect is defined%}
+  <h4>Existing meetings</h4>
+  <ul>
+  {% for col in session.collect %}
+    <li> <a href="./view/{{col}}">"{{col}}" </a></li>
+  {% endfor %}
+  </ul>
+{% endif %}
+<button type=button onclick="window.location.replace('./create')">Create a Meeting</button>
+</div>
+</body> </html>

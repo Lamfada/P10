@@ -1,0 +1,99 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html lang="en"> <head>
+<title>MeetMe:View Appointments</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="stylesheet" type="text/css"
+     href="//cdn.jsdelivr.net/bootstrap/latest/css/bootstrap.css"
+/>
+
+<link rel="stylesheet" type="text/css"
+ href="/static/js/node_modules/bootstrap-daterangepicker/daterangepicker.css"
+/>
+
+<link rel="stylesheet" type="text/css"
+    href="/static/css/busy.css"
+/>
+
+<!-- jquery from a content distribution network; probably cached -->
+<script type="text/javascript"
+     src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js">
+</script>
+
+
+<!-- The rest of our javascript dependencies are bundled and -->
+<!-- 'minified' by 'browserify'  -->
+<script type="text/javascript" 
+   src="/static/js/busy.min.js">
+</script>
+
+</head>
+
+<body>
+<br>
+<button type=button onclick=" window.location .replace('../')">Return to Menu</button>
+
+{% if session.free is defined %}
+  <div align="center">
+  <form action="/setrange" method="post">
+  {% if session.title is defined %}
+    <h1 style="color:darkred"><ins>{{session.title}}</ins></h1>
+    <input type="hidden" id="title" name="title" value={{session.title}}>
+  {% else %}
+    <h1 style="color:darkred"><ins>Title Not Found</ins></h1>
+  {% endif %}
+  {% if session.desc is defined %}
+    <p style="color:darkred" id="desc" name="desc" value={{session.desc}}>{{session.desc}}</p>
+  {% endif %}
+  <ul>
+  {% for item in session.free %}
+    <li>{{item}}</li> 
+  {% endfor %}
+  </ul>
+  <input type="submit" value="Choose" />
+  </form>
+
+<form action="/setcheck" method="post">
+{% if session.calendars is defined  %}
+  <div class="col-md-4">
+  {% for cal in session.calendars if cal.selected %}
+          <div class="row">
+	   <input type="checkbox" name="box" value="{{cal.id}}" {% if cal.checked %} checked="Checked" {% endif %}>{{ cal.summary }}
+          </div>
+         {% if loop.index is divisibleby 3 %}
+          </div> <div class="row">
+         {% endif %}
+  {% endfor %}
+  </div>
+{% endif %}
+<button type="button" id="check" name="check" onclick="fn()">Check</button>
+</form>
+</div>
+
+{% else %}
+  <h1>Error: Meeting Not Found</h1>
+{% endif %}
+
+
+<script>
+function fn(){
+   var boxes = document.getElementsByName('box');
+   var cal_ids = '';
+   var title =document.getElementById('title').value;
+   for(var i = 0; i < boxes.length; i++){
+      if(boxes[i].checked){
+         if (cal_ids.length > 0){
+            cal_ids = cal_ids.concat(" ");
+         }
+         cal_ids = cal_ids.concat(boxes[i].value);
+      }
+   }
+   $.getJSON( "/_check_apt", { name: title, calen: cal_ids}, 
+              function(data) {
+                var res = data.result;
+                location.reload();
+              }
+          );
+}
+</script>
+</body> </html>
